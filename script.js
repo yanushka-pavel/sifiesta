@@ -19,13 +19,9 @@ document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   // Show first item
   if (childItems[0]) childItems[0].style.display = "flex";
 
-
-// Hover sticky elements
- buttonWrap.forEach(wrap => {
-wrap.addEventListener("mousemove", (e)=>{
-    let buttonElement;
-    if(wrap.classList.contains("is-next")){
-        buttonElement = wrap.querySelector(".is-next");
+  //mouse hover function
+ const moseWrapHover = function (wrap,e){
+        buttonElement = wrap.querySelector(".btn-element");
         buttonElement.style.visibility = "visible";
         const elementWidth = buttonElement.offsetWidth; //offsetWidth - width of the element with all paddings and margins
         const elementHeight = buttonElement.offsetHeight;    
@@ -48,8 +44,19 @@ wrap.addEventListener("mousemove", (e)=>{
         buttonElement.style.left = scaleLineX * 100 + "%";
         buttonElement.style.top = scaleLineY * 100 + "%";
         wrap.addEventListener("mouseleave", ()=>{
-            buttonElement.style.visibility = "hidden";
+            if(buttonElement) buttonElement.style.visibility = "hidden";
         })
+    }
+// Hover sticky elements
+ buttonWrap.forEach(wrap => {
+wrap.addEventListener("mousemove", (e)=>{
+    let buttonElement;
+   
+    if(wrap.classList.contains("is-next")){
+        moseWrapHover(wrap,e)
+    }
+    else {
+        moseWrapHover(wrap,e)
     }
 })});
 
@@ -125,20 +132,20 @@ wrap.addEventListener("mousemove", (e)=>{
     moveSlide(nextIndex, true);
   }
 
-//   buttonWrap(arrow => {
-//     if (arrow.classList.contains("is-next")) {
-//       arrow.addEventListener("click", () => {
-//         goNext(activeIndex + 1);
-//       });
-//     }
-//     if (arrow.classList.contains("is-prev")) {
-//       arrow.addEventListener("click", () => {
-//         let nextIndex = activeIndex - 1;
-//         if (nextIndex < 0) nextIndex = totalSlides - 1;
-//         moveSlide(nextIndex, false);
-//       });
-//     }
-//   });
+  buttonWrap.forEach(arrow => {
+    if (arrow.classList.contains("is-next")) {
+      arrow.addEventListener("click", () => {
+        goNext(activeIndex + 1);
+      });
+    }
+    if (arrow.classList.contains("is-prev")) {
+      arrow.addEventListener("click", () => {
+        let nextIndex = activeIndex - 1;
+        if (nextIndex < 0) nextIndex = totalSlides - 1;
+        moveSlide(nextIndex, false);
+      });
+    }
+  });
 
   // CLICK OF DOTS
   childDotsClick.forEach(dotClick => {
