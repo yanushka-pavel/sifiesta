@@ -73,21 +73,24 @@ setupMouse(buttonWrap,buttonText);
     let nextItem = childItems[nextIndex];
     let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
     let prevItem = childItems[activeIndex];
-
+    let prevImage = childItems[activeIndex].querySelector(".slider_cms_img");
     if (forwards) {
   // Clip-path for page swipe
-  tl.fromTo(nextItem, 
-    { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }, 
-    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, -30% 100%)" });
+  
 
   tl.fromTo(prevItem, 
-    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
-    { clipPath: "polygon(0% 0%, 0% 0%, -30% 100%, 0% 100%)" }, "<"); // "<" = simultaneous
+    { clipPath: "polygon(0% 0%, 150% 0%, 100% 100%, 0% 100%)" }, 
+    { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 100%)" }); // "<" = simultaneous
+    
+   tl.fromTo(nextItem, 
+    { clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 0% 100%)" }, 
+    { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 0% 100%)" }, "<");
+
 
   // Image zoom + skew for fan effect
-  tl.fromTo(nextImage, 
-    { scale: 2, skewY: -10, transformOrigin: "bottom right" }, 
-    { scale: 1, skewY: 0, duration: 0.8 }, "<"); // "<" = start together with clip-path
+  tl.fromTo(prevImage, 
+    { scale: 1, transformOrigin: "left bottom" }, 
+    { scale: 2,x:-1000,  duration: 0.8 }, "<"); // "<" = start together with clip-path
 
 } else {
   // Reverse direction
@@ -100,9 +103,9 @@ setupMouse(buttonWrap,buttonText);
     { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 130% 100%)" }, "<");
 
   // Image zoom + skew for opposite fan effect
-  tl.fromTo(nextImage, 
-    { scale: 2, skewY: -10, transformOrigin: "top left" }, 
-    { scale: 1, skewY: 0, duration: 0.8 }, "<");
+  tl.fromTo(prevImage, 
+    { scale: 2, transformOrigin: "top left" }, 
+    { scale: 1,  duration: 0.8 }, "<");
 }
 
     // Animate characters inside slider_cms_title
