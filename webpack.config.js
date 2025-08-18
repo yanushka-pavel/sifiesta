@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
   mode: "development",
   entry: {
-    ["global"]: "./script.js",
+    ["global"]: ["./script.js"],
   },
   output: {
     path: path.resolve(__dirname, "dist"),

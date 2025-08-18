@@ -1,3 +1,6 @@
+import {setupMouse} from './cursor.js'; // executes code in cursor.js
+import './style.css';
+
 let splitType = new SplitType(".slider_cms_title", {
   types: "words, chars",
   tagName: "span"
@@ -12,53 +15,15 @@ document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let totalSlides = childItems.length;
   let activeIndex = 0;
   let buttonWrap = sliderWrap.querySelectorAll(".btn-wrap")
-
+  let buttonText = sliderWrap.querySelector(".btn-text")
 
   // Hide all childItems initially
   childItems.forEach(item => item.style.display = "none");
   // Show first item
   if (childItems[0]) childItems[0].style.display = "flex";
 
-  //mouse hover function
- const moseWrapHover = function (wrap,e){
-        buttonElement = wrap.querySelector(".btn-element");
-        buttonElement.style.visibility = "visible";
-        const elementWidth = buttonElement.offsetWidth; //offsetWidth - width of the element with all paddings and margins
-        const elementHeight = buttonElement.offsetHeight;    
-        const rect = wrap.getBoundingClientRect();
-        const Mx = e.clientX - rect.left - elementWidth/2;
-        const My = e.clientY - rect.top - elementHeight/2;
-        //we also need to get the whole size of each wrapper
-        const wrapperWidth = rect.width;
-        const wrapperHeight = rect.height;
-        /*we need to compare if our value is greater than 0 and less than 1
-        1>num>0
-        Math.max(num,0) - num>0?
-        Math.min(num,1) - num<1?
-        and get either our number if its insie the approved values, or max if the mouse goes to far right, or min if it overflows left wrapper
-        */
-        const clamp = (num,min,max) => Math.min(Math.max(num, min), max);
-        //now we want to have a scale from 0 to 1, not pixels sizes
-        const scaleLineX = clamp(Mx / wrapperWidth, 0,1);
-        const scaleLineY = clamp(My / wrapperHeight, 0,1);
-        buttonElement.style.left = scaleLineX * 100 + "%";
-        buttonElement.style.top = scaleLineY * 100 + "%";
-        wrap.addEventListener("mouseleave", ()=>{
-            if(buttonElement) buttonElement.style.visibility = "hidden";
-        })
-    }
-// Hover sticky elements
- buttonWrap.forEach(wrap => {
-wrap.addEventListener("mousemove", (e)=>{
-    let buttonElement;
-   
-    if(wrap.classList.contains("is-next")){
-        moseWrapHover(wrap,e)
-    }
-    else {
-        moseWrapHover(wrap,e)
-    }
-})});
+//mouse animation
+setupMouse(buttonWrap,buttonText);
 
   // gsap set for first dot line
   if (childDots[0]) {
