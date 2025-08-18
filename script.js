@@ -1,15 +1,21 @@
 import {setupMouse} from './cursor.js'; // executes code in cursor.js
 import './style.css';
-
 let splitType = new SplitType(".slider_cms_title", {
-  types: "words, chars",
+  types: "lines",
   tagName: "span"
 });
 
+document.querySelectorAll(".slider_cms_title .line").forEach(line => {
+  let wrapper = document.createElement("div");
+  wrapper.style.overflow = "hidden";
+  line.parentNode.insertBefore(wrapper,line);//line.parentNode - finds the parent of line element, insertbefore puts wrapper before the line element
+  wrapper.appendChild(line); // puts line element inside wrapper
+})
 // Select all .slider_wrap elements and iterate over them
 document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let childArrow = sliderWrap.querySelectorAll(".slider_btn");
   let childItems = sliderWrap.querySelectorAll(".slider_cms_item");
+  let childImage = sliderWrap.querySelectorAll(".slider_cms_img");
   let childDots = sliderWrap.querySelectorAll(".slider_dot_item");
   let childDotsClick = sliderWrap.querySelectorAll(".slider_dot_click");
   let totalSlides = childItems.length;
@@ -52,10 +58,10 @@ setupMouse(buttonWrap,buttonText);
 
     tl2.seek(`step${nextIndex}`);
 
-    let titleFrom = -100;
+    let titleFrom = -400;
     let titleDelay = "<";
     if (forwards) {
-      titleFrom = 100;
+      titleFrom = 400;
       titleDelay = "<50%";
     }
 
@@ -65,27 +71,57 @@ setupMouse(buttonWrap,buttonText);
 
     let tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.inOut" } });
     let nextItem = childItems[nextIndex];
+    let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
     let prevItem = childItems[activeIndex];
 
     if (forwards) {
-      tl.fromTo(nextItem, 
-        { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }, 
-        { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, -30% 100%)" });
-      tl.fromTo(prevItem, 
-        { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
-        { clipPath: "polygon(0% 0%, 0% 0%, -30% 100%, 0% 100%)" }, "<");
-    } else {
-      tl.fromTo(nextItem, 
-        { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" }, 
-        { clipPath: "polygon(0% 0%, 100% 0%, 130% 100%, 0% 100%)" });
-      tl.fromTo(prevItem, 
-        { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
-        { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 130% 100%)" }, "<");
-    }
+  // Clip-path for page swipe
+  tl.fromTo(nextItem, 
+    { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }, 
+    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, -30% 100%)" });
+
+  tl.fromTo(prevItem, 
+    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
+    { clipPath: "polygon(0% 0%, 0% 0%, -30% 100%, 0% 100%)" }, "<"); // "<" = simultaneous
+
+  // Image zoom + skew for fan effect
+  tl.fromTo(nextImage, 
+    { scale: 2, skewY: -10, transformOrigin: "bottom right" }, 
+    { scale: 1, skewY: 0, duration: 0.8 }, "<"); // "<" = start together with clip-path
+
+} else {
+  // Reverse direction
+  tl.fromTo(nextItem, 
+    { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" }, 
+    { clipPath: "polygon(0% 0%, 100% 0%, 130% 100%, 0% 100%)" });
+
+  tl.fromTo(prevItem, 
+    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
+    { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 130% 100%)" }, "<");
+
+  // Image zoom + skew for opposite fan effect
+  tl.fromTo(nextImage, 
+    { scale: 2, skewY: -10, transformOrigin: "top left" }, 
+    { scale: 1, skewY: 0, duration: 0.8 }, "<");
+}
 
     // Animate characters inside slider_cms_title
-    let chars = nextItem.querySelectorAll(".slider_cms_title .char");
-    gsap.fromTo(chars, { yPercent: titleFrom }, { yPercent: 0, stagger: 0.08 });
+    let lines = nextItem.querySelectorAll(".slider_cms_title .line");
+    gsap.fromTo(
+  lines,
+  { 
+    yPercent: titleFrom, 
+    opacity: 0, 
+    skewY: 20,
+  }, 
+  { 
+    yPercent: 0, 
+    opacity: 1, 
+    skewY: 0, 
+    duration: 1.5, 
+    ease: "power3.out" 
+  }
+);
 
     activeIndex = nextIndex;
   }
