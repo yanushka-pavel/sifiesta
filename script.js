@@ -1,5 +1,6 @@
 import {setupMouse} from './cursor.js'; // executes code in cursor.js
 import './style.css';
+let buttonElement = document.querySelector(".btn-element");
 let splitType = new SplitType(".slider_cms_title", {
   types: "lines",
   tagName: "span"
@@ -50,10 +51,12 @@ setupMouse(buttonWrap,buttonText);
     });
   });
 
+
   // MAIN SLIDER CODE
-  
+    let animating = false;  
   function moveSlide(nextIndex, forwards) {
-    
+    if (animating) return;
+    animating = true;
     let tl3 = gsap.timeline();
     tl3.set(childDots[nextIndex].querySelector(".slider_dot_line"), { x: "0%" });
     tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" });
@@ -71,8 +74,9 @@ setupMouse(buttonWrap,buttonText);
     childItems.forEach((item, i) => {
         item.style.display = "none";
         let img = item.querySelector(".slider_cms_img");
-        if (img) gsap.set(img, { scale: 1, transformOrigin: "left bottom" });
-        gsap.set(item, { "--angle": "0deg" });
+        if (img) gsap.set(img, { scale: 1, transformOrigin: "left bottom",x:0,y:0,rotate:0,skewY:0 });
+        gsap.set(item, { "--angle": "0deg", x:0, skewY:0 });
+        
     });
     
     childItems[activeIndex].style.display = "flex";
@@ -84,50 +88,55 @@ setupMouse(buttonWrap,buttonText);
     let prevItem = childItems[activeIndex];
     let prevImage = childItems[activeIndex].querySelector(".slider_cms_img");
     let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
-
+    buttonElement.style.zIndex = 4;
     
     
     if (forwards) {
-  // Clip-path for page swipe
-  prevItem.style.zIndex = 1;
-  nextItem.style.zIndex = 2;
+    // Clip-path for page swipe
+    prevItem.style.zIndex = 1;
+    nextItem.style.zIndex = 2;
+    
 
-console.log("Forwards")
-console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
-console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
-// REVEAL the next slide with an opposite sweep
+    console.log("Forwards")
+    console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
+    console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
+    // REVEAL the next slide with an opposite sweep
 
-gsap.fromTo(nextItem, 
-  { "--angle": "90deg" }, 
-  { "--angle": "0deg", duration: 0.8, ease: "power2.inOut"}, "<"
-);
-  // Image zoom + skew for fan effect
-  tl.fromTo(prevImage, 
-    { scale: 1, transformOrigin: "left bottom" }, 
-    { scale: 2,  duration: 0.5 }, "<"); // "<" = start together with clip-path
-  tl.set(prevImage, {
-    scale: 1,
-  },"+=0.2")
-} else {
+    gsap.fromTo(nextItem, 
+      { "--angle": "90deg" }, 
+      { "--angle": "0deg", duration: 1.2, ease: "back.out(0.1)"}, "<"
+    );
 
-prevItem.style.zIndex = 2;
-nextItem.style.zIndex = 1;
-  // Reverse direction
-console.log("Backwards")
-console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
-console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
-// REVEAL the next slide with an opposite sweep
+      // Image zoom + skew for fan effect
+      tl.fromTo(prevImage, 
+        { scale: 1, transformOrigin: "left bottom" }, 
+        { scale: 2,y:300,x:-1020,rotate:-15, duration: 1, onComplete: ()=> {
+          animating = false;
+        } }, "+=0.2"); // "<" = start together with clip-path
+        
+    } else {
 
-gsap.to(prevItem, 
+    prevItem.style.zIndex = 2;
+    nextItem.style.zIndex = 1;
+      // Reverse direction
+    console.log("Backwards")
+    console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
+    console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
+    // REVEAL the next slide with an opposite sweep
 
-  { "--angle": "90deg", duration: 0.8, ease: "power2.inOut"}, "<"
-);
-  // Image zoom + skew for fan effect
-  tl.fromTo(nextImage, 
-    { scale: 2, transformOrigin: "left bottom" }, 
-    { scale: 1,  duration: 0.5 }, "<"); // "<" = start together with clip-path
+    gsap.fromTo(prevItem, 
+      { "--angle": "0deg"},
+      { "--angle": "90deg", duration: 1.2, ease: "power2.inOut"}, "<"
+    );
+      // Image zoom + skew for fan effect
+    tl.fromTo(prevImage, 
+        { scale: 1, transformOrigin: "left bottom" }, 
+        { scale: 2,y:300,x:1020,rotate:15, duration: 1, onComplete: ()=> {
+          animating = false;
+        } }, "<"); // "<" = start together with clip-path
+        
 
-}
+    }
 
     // Animate characters inside slider_cms_title
     let lines = nextItem.querySelectorAll(".slider_cms_title .line");
