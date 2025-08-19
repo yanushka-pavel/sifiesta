@@ -1,4 +1,4 @@
-let buttonElement = document.querySelector(".btn-element");
+export let buttonElement = document.querySelector(".btn-element");
 const speed = 0.1;
 
 // Hover sticky elements
