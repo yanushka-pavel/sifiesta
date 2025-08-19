@@ -43,7 +43,7 @@ setupMouse(buttonWrap,buttonText);
     tl2.to(dot.querySelector(".slider_dot_line"), {
       scaleX: "1.0",
       ease: "none",
-      duration: 5,
+      duration: 50,
       onComplete: () => {
         goNext(index + 1);
       }
@@ -51,7 +51,9 @@ setupMouse(buttonWrap,buttonText);
   });
 
   // MAIN SLIDER CODE
+  
   function moveSlide(nextIndex, forwards) {
+    
     let tl3 = gsap.timeline();
     tl3.set(childDots[nextIndex].querySelector(".slider_dot_line"), { x: "0%" });
     tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" });
@@ -65,44 +67,66 @@ setupMouse(buttonWrap,buttonText);
       titleDelay = "<50%";
     }
 
-    childItems.forEach(item => item.style.display = "none");
+    //resetting all positions
+    childItems.forEach((item, i) => {
+        item.style.display = "none";
+        let img = item.querySelector(".slider_cms_img");
+        if (img) gsap.set(img, { scale: 1, transformOrigin: "left bottom" });
+        gsap.set(item, { "--angle": "0deg" });
+    });
+    
     childItems[activeIndex].style.display = "flex";
     childItems[nextIndex].style.display = "flex";
 
     let tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.inOut" } });
     let nextItem = childItems[nextIndex];
-    let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
+   
     let prevItem = childItems[activeIndex];
+    let prevImage = childItems[activeIndex].querySelector(".slider_cms_img");
+    let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
 
+    
+    
     if (forwards) {
   // Clip-path for page swipe
-  tl.fromTo(nextItem, 
-    { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }, 
-    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, -30% 100%)" });
+  prevItem.style.zIndex = 1;
+  nextItem.style.zIndex = 2;
 
-  tl.fromTo(prevItem, 
-    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
-    { clipPath: "polygon(0% 0%, 0% 0%, -30% 100%, 0% 100%)" }, "<"); // "<" = simultaneous
+console.log("Forwards")
+console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
+console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
+// REVEAL the next slide with an opposite sweep
 
+gsap.fromTo(nextItem, 
+  { "--angle": "90deg" }, 
+  { "--angle": "0deg", duration: 0.8, ease: "power2.inOut"}, "<"
+);
+  // Image zoom + skew for fan effect
+  tl.fromTo(prevImage, 
+    { scale: 1, transformOrigin: "left bottom" }, 
+    { scale: 2,  duration: 0.5 }, "<"); // "<" = start together with clip-path
+  tl.set(prevImage, {
+    scale: 1,
+  },"+=0.2")
+} else {
+
+prevItem.style.zIndex = 2;
+nextItem.style.zIndex = 1;
+  // Reverse direction
+console.log("Backwards")
+console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
+console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
+// REVEAL the next slide with an opposite sweep
+
+gsap.to(prevItem, 
+
+  { "--angle": "90deg", duration: 0.8, ease: "power2.inOut"}, "<"
+);
   // Image zoom + skew for fan effect
   tl.fromTo(nextImage, 
-    { scale: 2, skewY: -10, transformOrigin: "bottom right" }, 
-    { scale: 1, skewY: 0, duration: 0.8 }, "<"); // "<" = start together with clip-path
+    { scale: 2, transformOrigin: "left bottom" }, 
+    { scale: 1,  duration: 0.5 }, "<"); // "<" = start together with clip-path
 
-} else {
-  // Reverse direction
-  tl.fromTo(nextItem, 
-    { clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)" }, 
-    { clipPath: "polygon(0% 0%, 100% 0%, 130% 100%, 0% 100%)" });
-
-  tl.fromTo(prevItem, 
-    { clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }, 
-    { clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 130% 100%)" }, "<");
-
-  // Image zoom + skew for opposite fan effect
-  tl.fromTo(nextImage, 
-    { scale: 2, skewY: -10, transformOrigin: "top left" }, 
-    { scale: 1, skewY: 0, duration: 0.8 }, "<");
 }
 
     // Animate characters inside slider_cms_title
