@@ -36,6 +36,7 @@ setupMouse(buttonWrap,buttonText);
   // gsap set for first dot line
   if (childDots[0]) {
     gsap.set(childDots[0].querySelector(".slider_dot_line"), { x: "0%" });
+    gsap.set(childDots[0], { width:"5rem",height:"0.3rem",borderRadius:"30%" });
   }
 
   // DOT LINES
@@ -45,7 +46,7 @@ setupMouse(buttonWrap,buttonText);
     tl2.to(dot.querySelector(".slider_dot_line"), {
       scaleX: "1.0",
       ease: "none",
-      duration: 50,
+      duration: 3,
       onComplete: () => {
         goNext(index + 1);
       }
@@ -55,12 +56,14 @@ setupMouse(buttonWrap,buttonText);
 
   // MAIN SLIDER CODE
     let animating = false;  
-  function moveSlide(nextIndex, forwards) {
+    function moveSlide(nextIndex, forwards) {
     if (animating) return;
     animating = true;
     let tl3 = gsap.timeline();
     tl3.set(childDots[nextIndex].querySelector(".slider_dot_line"), { x: "0%" });
-    tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" });
+    tl3.to(childDots[nextIndex], { width: "5rem", height: "0.3rem", borderRadius: "20%"},);
+    tl3.to(childDots[activeIndex], {width:"0.75rem",height:"0.75rem", borderRadius: "100%"},"<")
+    tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" },"<");
 
     tl2.seek(`step${nextIndex}`);
 
@@ -182,7 +185,7 @@ setupMouse(buttonWrap,buttonText);
     yPercent: 0, 
     opacity: 1, 
     skewY: 0, 
-    duration: 1.5, 
+    duration: 1.2, 
     ease: "power3.out" 
   },"-=0.5"
 );
