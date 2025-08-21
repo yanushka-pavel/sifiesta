@@ -1,15 +1,6 @@
 .btn-wrap { cursor: pointer; }
 
-.slider_cms_item {
-  --angle: 0deg;
-  -webkit-mask-image: conic-gradient(from var(--angle) at 0% 500%, rgba(0,0,0,1) 0deg, rgba(0,0,0,1) 90deg, transparent 90deg);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: cover;
 
-  mask-image: conic-gradient(from var(--angle) at 0% 500%, rgba(0,0,0,1) 0deg, rgba(0,0,0,1) 90deg, transparent 90deg);
-  mask-repeat: no-repeat;
-  mask-size: cover; /*twice for browser support*/
-}
 
 
 /*The mask is anchored at C (at 0% 100%).

@@ -6,6 +6,7 @@ let splitType = new SplitType(".slider_cms_title", {
   tagName: "span"
 });
 
+
 document.querySelectorAll(".slider_cms_title .line").forEach(line => {
   let wrapper = document.createElement("div");
   wrapper.style.overflow = "hidden";
@@ -92,51 +93,81 @@ setupMouse(buttonWrap,buttonText);
     
     
     if (forwards) {
-    // Clip-path for page swipe
+    // Forward animation
     prevItem.style.zIndex = 1;
     nextItem.style.zIndex = 2;
+
+    // Set transform origins
+    prevItem.style.transformOrigin = "bottom right"; // current pivot
+    nextItem.style.transformOrigin = "bottom left"; // next slide pivot aligns diagonal
+      tl.fromTo(nextImage,
+      { scale: 1.8,},
+      { scale: 1, duration: 0.8, ease: "power1.inOut",
+        },
+      "<"
+    );
+    // Animate the next slide mask
+     tl.fromTo(nextImage,
+      { scale: 1.8,  x: nextItem.offsetWidth, y: 0, rotate: 15 },
+      { scale: 1, x: 0, y: 0, rotate: 0, duration: 0.9, ease: "power2.inOut",
+      },
+      "<"
+    );
+
+    // Animate the previous image with fan effect
+    tl.fromTo(prevImage,
+      { scale: 1,},
+      { scale: 1.4,
+        duration: 0.8, ease: "power2.inOut" },"<"
+    );
+    
+     tl.fromTo(prevImage,
+      { x: 0, y:0},
+      { x: -prevItem.offsetWidth, y: "10%",
+        duration: 0.8, ease: "power2.inOut", 
+      onComplete: () => { animating = false; }  },"-=0.8"
+    );
+
+    // Animate the next image into view
+   
+
+} else {
+  prevItem.style.zIndex = 1;
+  nextItem.style.zIndex = 2;
+  nextImage.style.transformOrigin = "bottom right"; // next slide pivot aligns diagonal
+  prevImage.style.transformOrigin = "bottom right";
+    tl.fromTo(nextImage,
+      { scale: 1.8,},
+      { scale: 1, duration: 0.8, ease: "power1.inOut",
+       },
+      "<"
+    );
+    // Animate the next slide mask
+     tl.fromTo(nextImage,
+      {  scale: 1.8,x: -nextItem.offsetWidth, y: 0,rotate: -15,},
+      {  scale:1,x: 0, y: 0, rotate: 0, duration: 0.9, ease: "power2.inOut",
+      },
+      
+      "<"
+    );
     
 
-    console.log("Forwards")
-    console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
-    console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
-    // REVEAL the next slide with an opposite sweep
-
-    gsap.fromTo(nextItem, 
-      { "--angle": "90deg" }, 
-      { "--angle": "0deg", duration: 1.2, ease: "back.out(0.1)"}, "<"
+    // Animate the previous image with fan effect
+    tl.fromTo(prevImage,
+      { scale: 1,},
+      { scale: 1.4,
+        duration: 0.8, ease: "power2.inOut" },"<"
+    );
+    
+     tl.fromTo(prevImage,
+      { x: 0, y:0},
+      { x: prevItem.offsetWidth, y: "10%",
+        duration: 0.8, ease: "power2.inOut",
+       onComplete: () => { animating = false; } },"-=0.8"
     );
 
-      // Image zoom + skew for fan effect
-      tl.fromTo(prevImage, 
-        { scale: 1, transformOrigin: "left bottom" }, 
-        { scale: 2,y:300,x:-1020,rotate:-15, duration: 1, onComplete: ()=> {
-          animating = false;
-        } }, "+=0.2"); // "<" = start together with clip-path
-        
-    } else {
+}
 
-    prevItem.style.zIndex = 2;
-    nextItem.style.zIndex = 1;
-      // Reverse direction
-    console.log("Backwards")
-    console.log(`Current Item is ${prevItem.querySelector(".slider_cms_title").textContent}`);
-    console.log(`Next Item is ${nextItem.querySelector(".slider_cms_title").textContent}`);
-    // REVEAL the next slide with an opposite sweep
-
-    gsap.fromTo(prevItem, 
-      { "--angle": "0deg"},
-      { "--angle": "90deg", duration: 1.2, ease: "power2.inOut"}, "<"
-    );
-      // Image zoom + skew for fan effect
-    tl.fromTo(prevImage, 
-        { scale: 1, transformOrigin: "left bottom" }, 
-        { scale: 2,y:300,x:1020,rotate:15, duration: 1, onComplete: ()=> {
-          animating = false;
-        } }, "<"); // "<" = start together with clip-path
-        
-
-    }
 
     // Animate characters inside slider_cms_title
     let lines = nextItem.querySelectorAll(".slider_cms_title .line");
@@ -153,7 +184,7 @@ setupMouse(buttonWrap,buttonText);
     skewY: 0, 
     duration: 1.5, 
     ease: "power3.out" 
-  }
+  },"-=0.5"
 );
 
     activeIndex = nextIndex;
