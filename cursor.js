@@ -20,7 +20,7 @@ wrap.addEventListener("mousemove", (e)=>{
     };
     
 })});
-console.log("it is workinggggg")
+
 }
  
 //mouse hover function
