@@ -1,5 +1,7 @@
 import {setupMouse} from './cursor.js'; // executes code in cursor.js
 import './style.css';
+import './cms-buttons.js';
+import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation} from './cms-buttons.js';
 let buttonElement = document.querySelector(".btn-element");
 let splitType = new SplitType(".slider_cms_title", {
   types: "lines",
@@ -24,19 +26,19 @@ document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let activeIndex = 0;
   let buttonWrap = sliderWrap.querySelectorAll(".btn-wrap")
   let buttonText = sliderWrap.querySelector(".btn-text")
-
+  const cmsButtons = document.querySelectorAll(".button.slider");
   // Hide all childItems initially
   childItems.forEach(item => item.style.display = "none");
   // Show first item
   if (childItems[0]) childItems[0].style.display = "flex";
-
+  cmsButtons[0].style.visibility = "visible";
 //mouse animation
 setupMouse(buttonWrap,buttonText);
 
   // gsap set for first dot line
   if (childDots[0]) {
     gsap.set(childDots[0].querySelector(".slider_dot_line"), { x: "0%" });
-    gsap.set(childDots[0], { width:"5rem",height:"0.3rem",borderRadius:"30%" });
+    gsap.set(childDots[0], { width:"5rem",height:"0.3rem",borderRadius:"15%" });
   }
 
   // DOT LINES
@@ -46,7 +48,7 @@ setupMouse(buttonWrap,buttonText);
     tl2.to(dot.querySelector(".slider_dot_line"), {
       scaleX: "1.0",
       ease: "none",
-      duration: 3,
+      duration: 5,
       onComplete: () => {
         goNext(index + 1);
       }
@@ -57,11 +59,12 @@ setupMouse(buttonWrap,buttonText);
   // MAIN SLIDER CODE
     let animating = false;  
     function moveSlide(nextIndex, forwards) {
+    cmsButtonsFunction(activeIndex, nextIndex);
     if (animating) return;
     animating = true;
     let tl3 = gsap.timeline();
     tl3.set(childDots[nextIndex].querySelector(".slider_dot_line"), { x: "0%" });
-    tl3.to(childDots[nextIndex], { width: "5rem", height: "0.3rem", borderRadius: "20%"},);
+    tl3.to(childDots[nextIndex], { width: "5rem", height: "0.3rem", borderRadius: "15%"},);
     tl3.to(childDots[activeIndex], {width:"0.75rem",height:"0.75rem", borderRadius: "100%"},"<")
     tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" },"<");
 
@@ -79,27 +82,26 @@ setupMouse(buttonWrap,buttonText);
         item.style.display = "none";
         let img = item.querySelector(".slider_cms_img");
         if (img) gsap.set(img, { scale: 1, transformOrigin: "left bottom",x:0,y:0,rotate:0,skewY:0 });
-        gsap.set(item, { "--angle": "0deg", x:0, skewY:0 });
+        gsap.set(item, { x:0, skewY:0 });
         
     });
     
+    
     childItems[activeIndex].style.display = "flex";
     childItems[nextIndex].style.display = "flex";
-
     let tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.inOut" } });
     let nextItem = childItems[nextIndex];
-   
     let prevItem = childItems[activeIndex];
     let prevImage = childItems[activeIndex].querySelector(".slider_cms_img");
     let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
     buttonElement.style.zIndex = 4;
     
-    
+
     if (forwards) {
     // Forward animation
     prevItem.style.zIndex = 1;
     nextItem.style.zIndex = 2;
-
+    buttonsTextAnimation(activeIndex, nextIndex);
     // Set transform origins
     prevItem.style.transformOrigin = "bottom right"; // current pivot
     nextItem.style.transformOrigin = "bottom left"; // next slide pivot aligns diagonal
@@ -135,6 +137,7 @@ setupMouse(buttonWrap,buttonText);
    
 
 } else {
+buttonsTextAnimation(activeIndex, nextIndex);
   prevItem.style.zIndex = 1;
   nextItem.style.zIndex = 2;
   nextImage.style.transformOrigin = "bottom right"; // next slide pivot aligns diagonal
