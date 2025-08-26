@@ -19,7 +19,7 @@ document.querySelectorAll(".slider_cms_title .line").forEach(line => {
 document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let childArrow = sliderWrap.querySelectorAll(".slider_btn");
   let childItems = sliderWrap.querySelectorAll(".slider_cms_item");
-  let childImage = sliderWrap.querySelectorAll(".slider_cms_img");
+  let childImage = sliderWrap.querySelectorAll(".slider_cms_content");
   let childDots = sliderWrap.querySelectorAll(".slider_dot_item");
   let childDotsClick = sliderWrap.querySelectorAll(".slider_dot_click");
   let totalSlides = childItems.length;
@@ -27,6 +27,7 @@ document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let buttonWrap = sliderWrap.querySelectorAll(".btn-wrap")
   let buttonText = sliderWrap.querySelector(".btn-text")
   const cmsButtons = document.querySelectorAll(".button.slider");
+  const backgroundVideo = document.querySelectorAll(".slider_cms_video");
   // Hide all childItems initially
   childItems.forEach(item => item.style.display = "none");
   // Show first item
@@ -55,6 +56,13 @@ setupMouse(buttonWrap,buttonText);
     });
   });
 
+//function to reset video
+const resetVideo = function (index){
+const currentVideo = backgroundVideo[index]?.querySelector("video")
+if(currentVideo){
+    currentVideo.currentTime = 0;
+}
+}
 
   // MAIN SLIDER CODE
     let animating = false;  
@@ -80,7 +88,7 @@ setupMouse(buttonWrap,buttonText);
     //resetting all positions
     childItems.forEach((item, i) => {
         item.style.display = "none";
-        let img = item.querySelector(".slider_cms_img");
+        let img = item.querySelector(".slider_cms_content");
         if (img) gsap.set(img, { scale: 1, transformOrigin: "left bottom",x:0,y:0,rotate:0,skewY:0 });
         gsap.set(item, { x:0, skewY:0 });
         
@@ -92,8 +100,8 @@ setupMouse(buttonWrap,buttonText);
     let tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.inOut" } });
     let nextItem = childItems[nextIndex];
     let prevItem = childItems[activeIndex];
-    let prevImage = childItems[activeIndex].querySelector(".slider_cms_img");
-    let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
+    let prevImage = childItems[activeIndex].querySelector(".slider_cms_content");
+    let nextImage = childItems[nextIndex].querySelector(".slider_cms_content");
     buttonElement.style.zIndex = 4;
     
 
@@ -102,9 +110,11 @@ setupMouse(buttonWrap,buttonText);
     prevItem.style.zIndex = 1;
     nextItem.style.zIndex = 2;
     buttonsTextAnimation(activeIndex, nextIndex);
+    
     // Set transform origins
     prevItem.style.transformOrigin = "bottom right"; // current pivot
     nextItem.style.transformOrigin = "bottom left"; // next slide pivot aligns diagonal
+    tl.call(()=> resetVideo(activeIndex));
       tl.fromTo(nextImage,
       { scale: 1.8,},
       { scale: 1, duration: 0.8, ease: "power1.inOut",
@@ -132,8 +142,7 @@ setupMouse(buttonWrap,buttonText);
         duration: 0.8, ease: "power2.inOut", 
       onComplete: () => { animating = false; }  },"-=0.8"
     );
-
-    // Animate the next image into view
+    
    
 
 } else {
@@ -142,6 +151,7 @@ buttonsTextAnimation(activeIndex, nextIndex);
   nextItem.style.zIndex = 2;
   nextImage.style.transformOrigin = "bottom right"; // next slide pivot aligns diagonal
   prevImage.style.transformOrigin = "bottom right";
+  tl.call(()=> resetVideo(activeIndex));
     tl.fromTo(nextImage,
       { scale: 1.8,},
       { scale: 1, duration: 0.8, ease: "power1.inOut",
@@ -172,6 +182,7 @@ buttonsTextAnimation(activeIndex, nextIndex);
        onComplete: () => { animating = false; } },"-=0.8"
     );
 
+    
 }
 
 

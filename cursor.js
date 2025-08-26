@@ -16,7 +16,7 @@ wrap.addEventListener("mousemove", (e)=>{
         mouseWrapHover(wrap,e,buttonText, "Next")
     }
     else {
-        mouseWrapHover(wrap,e,buttonText, "Back")
+        mouseWrapHover(wrap,e,buttonText, "Prev")
     };
     
 })});
