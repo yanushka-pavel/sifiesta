@@ -1,12 +1,22 @@
-import {setupMouse} from './cursor.js'; // executes code in cursor.js
+import {setupMouse} from './animations/cursor.js'; // executes code in cursor.js
 import './style.css';
-import './cms-buttons.js';
-import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation} from './cms-buttons.js';
+import './animations/cms-buttons.js';
+import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation, buttonHoverAnimation} from './animations/cms-buttons.js';
+import { Load } from './animations/page-load.js';
+import { GeneralIndex } from './animations/slide-index-state.js';
+//pageLoad animation
+window.addEventListener("load", ()=> {
+  Load.pageLoadAnimation();
+})
+
+function initSlider (){
+
 let buttonElement = document.querySelector(".btn-element");
 let splitType = new SplitType(".slider_cms_title", {
   types: "lines",
   tagName: "span"
 });
+
 
 
 document.querySelectorAll(".slider_cms_title .line").forEach(line => {
@@ -43,7 +53,7 @@ setupMouse(buttonWrap,buttonText);
   }
 
   // DOT LINES
-  let tl2 = gsap.timeline({ repeat: -1 });
+  let tl2 = gsap.timeline({ repeat: -1});
   childDots.forEach((dot, index) => {
     tl2.addLabel(`step${index}`);
     tl2.to(dot.querySelector(".slider_dot_line"), {
@@ -67,17 +77,19 @@ if(currentVideo){
   // MAIN SLIDER CODE
     let animating = false;  
     function moveSlide(nextIndex, forwards) {
+    //genereal index update for button hover animation
+    GeneralIndex.updateSlideState(activeIndex, nextIndex);
+    //button text animation
     cmsButtonsFunction(activeIndex, nextIndex);
     if (animating) return;
     animating = true;
+    //animation for dots
     let tl3 = gsap.timeline();
     tl3.set(childDots[nextIndex].querySelector(".slider_dot_line"), { x: "0%" });
     tl3.to(childDots[nextIndex], { width: "5rem", height: "0.3rem", borderRadius: "15%"},);
     tl3.to(childDots[activeIndex], {width:"0.75rem",height:"0.75rem", borderRadius: "100%"},"<")
     tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" },"<");
-
     tl2.seek(`step${nextIndex}`);
-
     let titleFrom = -400;
     let titleDelay = "<";
     if (forwards) {
@@ -242,3 +254,9 @@ buttonsTextAnimation(activeIndex, nextIndex);
     });
   });
 });
+}
+window.addEventListener("load", ()=> {
+  setTimeout(()=> {
+    initSlider();
+  }, 2900);
+})
