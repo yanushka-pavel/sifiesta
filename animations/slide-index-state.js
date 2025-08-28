@@ -5,7 +5,11 @@ generalActiveIndex = active;
 generalNextIndex = next;
 }
 export const GeneralIndex = {
-    generalActiveIndex,
-    generalNextIndex,
+    get generalActiveIndex(){
+        return generalActiveIndex;
+    },
+    get generalNextIndex(){
+        return generalNextIndex;
+    },
     updateSlideState
 }

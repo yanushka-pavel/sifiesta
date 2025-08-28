@@ -1,7 +1,7 @@
 import {setupMouse} from './animations/cursor.js'; // executes code in cursor.js
 import './style.css';
 import './animations/cms-buttons.js';
-import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation, buttonHoverAnimation} from './animations/cms-buttons.js';
+import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation, buttonHoverAnimationIn, buttonHoverAnimationOut} from './animations/cms-buttons.js';
 import { Load } from './animations/page-load.js';
 import { GeneralIndex } from './animations/slide-index-state.js';
 //pageLoad animation
@@ -16,6 +16,7 @@ let splitType = new SplitType(".slider_cms_title", {
   types: "lines",
   tagName: "span"
 });
+
 
 
 
@@ -38,6 +39,9 @@ document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let buttonText = sliderWrap.querySelector(".btn-text")
   const cmsButtons = document.querySelectorAll(".button.slider");
   const backgroundVideo = document.querySelectorAll(".slider_cms_video");
+  // const buttonHoverWrap = document.querySelector(".button-hover-wrap");
+  // const buttonHoverEl = document.querySelector(".button-hover");
+  //button hover animation
   // Hide all childItems initially
   childItems.forEach(item => item.style.display = "none");
   // Show first item
@@ -65,6 +69,20 @@ setupMouse(buttonWrap,buttonText);
       }
     });
   });
+
+//button hover event listeners
+cmsButtons.forEach(button => {
+  button.addEventListener("mouseenter", (e)=> {
+    const buttonHoverEl = e.currentTarget
+    buttonHoverAnimationIn(tl2, buttonHoverEl);
+  }
+);
+});
+cmsButtons.forEach(button => {
+  button.addEventListener("mouseleave", (e)=> {
+    const buttonHoverEl = e.currentTarget
+  buttonHoverAnimationOut(tl2, buttonHoverEl);
+  });});
 
 //function to reset video
 const resetVideo = function (index){
