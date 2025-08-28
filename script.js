@@ -1,12 +1,23 @@
-import {setupMouse} from './cursor.js'; // executes code in cursor.js
+import {setupMouse} from './animations/cursor.js'; // executes code in cursor.js
 import './style.css';
-import './cms-buttons.js';
-import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation} from './cms-buttons.js';
+import './animations/cms-buttons.js';
+import {cmsButtonsFunction,currentButton,nextButton, currentButtonText,nextButtonText,buttonsTextAnimation, buttonHoverAnimationIn, buttonHoverAnimationOut} from './animations/cms-buttons.js';
+import { Load } from './animations/page-load.js';
+import { GeneralIndex } from './animations/slide-index-state.js';
+//pageLoad animation
+window.addEventListener("load", ()=> {
+  Load.pageLoadAnimation();
+})
+
+function initSlider (){
+
 let buttonElement = document.querySelector(".btn-element");
 let splitType = new SplitType(".slider_cms_title", {
   types: "lines",
   tagName: "span"
 });
+
+
 
 
 document.querySelectorAll(".slider_cms_title .line").forEach(line => {
@@ -19,7 +30,7 @@ document.querySelectorAll(".slider_cms_title .line").forEach(line => {
 document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let childArrow = sliderWrap.querySelectorAll(".slider_btn");
   let childItems = sliderWrap.querySelectorAll(".slider_cms_item");
-  let childImage = sliderWrap.querySelectorAll(".slider_cms_img");
+  let childImage = sliderWrap.querySelectorAll(".slider_cms_content");
   let childDots = sliderWrap.querySelectorAll(".slider_dot_item");
   let childDotsClick = sliderWrap.querySelectorAll(".slider_dot_click");
   let totalSlides = childItems.length;
@@ -27,6 +38,10 @@ document.querySelectorAll(".slider_wrap").forEach(sliderWrap => {
   let buttonWrap = sliderWrap.querySelectorAll(".btn-wrap")
   let buttonText = sliderWrap.querySelector(".btn-text")
   const cmsButtons = document.querySelectorAll(".button.slider");
+  const backgroundVideo = document.querySelectorAll(".slider_cms_video");
+  // const buttonHoverWrap = document.querySelector(".button-hover-wrap");
+  // const buttonHoverEl = document.querySelector(".button-hover");
+  //button hover animation
   // Hide all childItems initially
   childItems.forEach(item => item.style.display = "none");
   // Show first item
@@ -42,7 +57,7 @@ setupMouse(buttonWrap,buttonText);
   }
 
   // DOT LINES
-  let tl2 = gsap.timeline({ repeat: -1 });
+  let tl2 = gsap.timeline({ repeat: -1});
   childDots.forEach((dot, index) => {
     tl2.addLabel(`step${index}`);
     tl2.to(dot.querySelector(".slider_dot_line"), {
@@ -55,21 +70,44 @@ setupMouse(buttonWrap,buttonText);
     });
   });
 
+//button hover event listeners
+cmsButtons.forEach(button => {
+  button.addEventListener("mouseenter", (e)=> {
+    const buttonHoverEl = e.currentTarget
+    buttonHoverAnimationIn(tl2, buttonHoverEl);
+  }
+);
+});
+cmsButtons.forEach(button => {
+  button.addEventListener("mouseleave", (e)=> {
+    const buttonHoverEl = e.currentTarget
+  buttonHoverAnimationOut(tl2, buttonHoverEl);
+  });});
+
+//function to reset video
+const resetVideo = function (index){
+const currentVideo = backgroundVideo[index]?.querySelector("video")
+if(currentVideo){
+    currentVideo.currentTime = 0;
+}
+}
 
   // MAIN SLIDER CODE
     let animating = false;  
     function moveSlide(nextIndex, forwards) {
+    //genereal index update for button hover animation
+    GeneralIndex.updateSlideState(activeIndex, nextIndex);
+    //button text animation
     cmsButtonsFunction(activeIndex, nextIndex);
     if (animating) return;
     animating = true;
+    //animation for dots
     let tl3 = gsap.timeline();
     tl3.set(childDots[nextIndex].querySelector(".slider_dot_line"), { x: "0%" });
     tl3.to(childDots[nextIndex], { width: "5rem", height: "0.3rem", borderRadius: "15%"},);
     tl3.to(childDots[activeIndex], {width:"0.75rem",height:"0.75rem", borderRadius: "100%"},"<")
     tl3.fromTo(childDots[activeIndex].querySelector(".slider_dot_line"), { x: "0%" }, { x: "100%" },"<");
-
     tl2.seek(`step${nextIndex}`);
-
     let titleFrom = -400;
     let titleDelay = "<";
     if (forwards) {
@@ -80,7 +118,7 @@ setupMouse(buttonWrap,buttonText);
     //resetting all positions
     childItems.forEach((item, i) => {
         item.style.display = "none";
-        let img = item.querySelector(".slider_cms_img");
+        let img = item.querySelector(".slider_cms_content");
         if (img) gsap.set(img, { scale: 1, transformOrigin: "left bottom",x:0,y:0,rotate:0,skewY:0 });
         gsap.set(item, { x:0, skewY:0 });
         
@@ -92,8 +130,8 @@ setupMouse(buttonWrap,buttonText);
     let tl = gsap.timeline({ defaults: { duration: 1, ease: "power2.inOut" } });
     let nextItem = childItems[nextIndex];
     let prevItem = childItems[activeIndex];
-    let prevImage = childItems[activeIndex].querySelector(".slider_cms_img");
-    let nextImage = childItems[nextIndex].querySelector(".slider_cms_img");
+    let prevImage = childItems[activeIndex].querySelector(".slider_cms_content");
+    let nextImage = childItems[nextIndex].querySelector(".slider_cms_content");
     buttonElement.style.zIndex = 4;
     
 
@@ -102,9 +140,11 @@ setupMouse(buttonWrap,buttonText);
     prevItem.style.zIndex = 1;
     nextItem.style.zIndex = 2;
     buttonsTextAnimation(activeIndex, nextIndex);
+    
     // Set transform origins
     prevItem.style.transformOrigin = "bottom right"; // current pivot
     nextItem.style.transformOrigin = "bottom left"; // next slide pivot aligns diagonal
+    tl.call(()=> resetVideo(activeIndex));
       tl.fromTo(nextImage,
       { scale: 1.8,},
       { scale: 1, duration: 0.8, ease: "power1.inOut",
@@ -132,8 +172,7 @@ setupMouse(buttonWrap,buttonText);
         duration: 0.8, ease: "power2.inOut", 
       onComplete: () => { animating = false; }  },"-=0.8"
     );
-
-    // Animate the next image into view
+    
    
 
 } else {
@@ -142,6 +181,7 @@ buttonsTextAnimation(activeIndex, nextIndex);
   nextItem.style.zIndex = 2;
   nextImage.style.transformOrigin = "bottom right"; // next slide pivot aligns diagonal
   prevImage.style.transformOrigin = "bottom right";
+  tl.call(()=> resetVideo(activeIndex));
     tl.fromTo(nextImage,
       { scale: 1.8,},
       { scale: 1, duration: 0.8, ease: "power1.inOut",
@@ -172,6 +212,7 @@ buttonsTextAnimation(activeIndex, nextIndex);
        onComplete: () => { animating = false; } },"-=0.8"
     );
 
+    
 }
 
 
@@ -231,3 +272,9 @@ buttonsTextAnimation(activeIndex, nextIndex);
     });
   });
 });
+}
+window.addEventListener("load", ()=> {
+  setTimeout(()=> {
+    initSlider();
+  }, 2900);
+})
