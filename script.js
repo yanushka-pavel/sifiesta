@@ -231,7 +231,7 @@ buttonsTextAnimation(activeIndex, nextIndex);
     skewY: 0, 
     duration: 1.2, 
     ease: "power3.out" 
-  },"-=0.5"
+  },"-=0.4"
 );
 
     activeIndex = nextIndex;
